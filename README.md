@@ -1,7 +1,8 @@
 # Gold Simple Linear Regression
 
 This project uses **historical gold price data** sourced from  
-**[Investing.com – Gold Historical Data](https://www.investing.com/commodities/gold-historical-data)**
+**Investing.com**  
+https://www.investing.com/commodities/gold-historical-data
 
 A **web-based application** for analyzing gold price data using **Simple Linear Regression**, built with **Flask and Python**.
 
