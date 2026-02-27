@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Linear Regression Analysis Results</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='result.css') }}">
+    
+    <style>
+        /* Memastikan navbar items tetap rapi */
+        .navbar-nav {
+            flex-wrap: wrap;
+        }
+        .nav-item {
+            white-space: nowrap;
+        }
+        @media (max-width: 1200px) {
+            .navbar-nav {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- 🔷 NAVBAR -->
+<nav class="navbar navbar-expand-xl navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold">📊 Linear Regression</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="menu">
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link text-warning fw-semibold" href="{{ url_for('index') }}">
+                        ⬅ New Data
+                    </a>
+                </li>
+
+                <li class="nav-item"><a class="nav-link" href="#info">Info</a></li>
+                <li class="nav-item"><a class="nav-link" href="#statistics">Stats</a></li>
+                <li class="nav-item"><a class="nav-link" href="#raw">Raw</a></li>
+                <li class="nav-item"><a class="nav-link" href="#cleaning">Clean</a></li>
+                <li class="nav-item"><a class="nav-link" href="#regression-data">Reg Data</a></li>
+                <li class="nav-item"><a class="nav-link" href="#graph">Graph</a></li>
+                <li class="nav-item"><a class="nav-link" href="#model">Model</a></li>
+                <li class="nav-item"><a class="nav-link" href="#regression">Reg</a></li>
+                <li class="nav-item"><a class="nav-link" href="#prediction">Predict</a></li>
+                <li class="nav-item"><a class="nav-link" href="#evaluation">Eval</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-4">
+
+<h1 class="text-center mb-4">📊 Simple Linear Regression Analysis - Gold Price</h1>
+
+<!-- 1️⃣ INFO -->
+<div id="info" class="card mb-4 p-4">
+    <h4 class="section-title">Initial Data Information</h4>
+    <div class="row">
+        <div class="col-md-6">
+            <p><b>Number of rows:</b> {{ info_awal.jumlah_baris }}</p>
+            <p><b>Number of columns:</b> {{ info_awal.jumlah_kolom }}</p>
+        </div>
+        <div class="col-md-6">
+            <p><b>Column names:</b></p>
+            <ul>
+                {% for c in info_awal.kolom %}
+                <li>{{ c }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- 1️⃣.1️⃣ DESCRIPTIVE STATISTICS -->
+<div id="statistics" class="card mb-4 p-4">
+    <h4 class="section-title">📈 Descriptive Statistics - Gold Price</h4>
+    
+    <div class="row">
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Data Count (n)</p>
+                <h4 class="equation-blue">{{ stat.count }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Mean</p>
+                <h4 class="equation-green">{{ stat.mean }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Standard Deviation</p>
+                <h4 class="equation-blue">{{ stat.std }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Median (Q2)</p>
+                <h4 class="equation-green">{{ stat['50%'] }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Minimum</p>
+                <h4 class="text-danger">{{ stat.min }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Quartile 1 (Q1)</p>
+                <h4 class="equation-blue">{{ stat['25%'] }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Quartile 3 (Q3)</p>
+                <h4 class="equation-blue">{{ stat['75%'] }}</h4>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="p-3 border rounded bg-light text-center">
+                <p class="mb-1 text-muted">Maximum</p>
+                <h4 class="text-success">{{ stat.max }}</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-secondary mt-3">
+        <strong>Interpretation:</strong>
+        <p class="mb-0">
+            The gold price data consists of <b>{{ stat.count }}</b> daily observations with an average price of 
+            <b>{{ stat.mean }}</b>. The highest price recorded was <b>{{ stat.max }}</b> and the lowest was 
+            <b>{{ stat.min }}</b>, with a standard deviation of <b>{{ stat.std }}</b> indicating price 
+            fluctuations during the study period.
+        </p>
+    </div>
+</div>
+
+<!-- 2️⃣ RAW DATA -->
+<div id="raw" class="card mb-4 p-4">
+    <h4 class="section-title">Raw Data Preview</h4>
+    <div class="table-responsive">
+        {{ table_awal | safe }}
+    </div>
+</div>
+
+<!-- 3️⃣ CLEANING -->
+<div id="cleaning" class="card mb-4 p-4">
+    <h4 class="section-title">Data Cleaning Process</h4>
+    <ul>
+        <li>Removing commas in the <b>Price</b> column</li>
+        <li>Converting <b>Price</b> to numeric format</li>
+        <li>Removing empty data</li>
+        <li>Sorting data by date</li>
+    </ul>
+    <p><b>Number of rows after cleaning:</b> {{ info_setelah.jumlah_baris }}</p>
+</div>
+
+<!-- 4️⃣ REGRESSION DATA -->
+<div id="regression-data" class="card mb-4 p-4">
+    <h4 class="section-title">Data After Creating Days Variable</h4>
+    <div class="table-responsive">
+        {{ table_regresi | safe }}
+    </div>
+</div>
+
+<!-- 5️⃣ GRAPH -->
+<div id="graph" class="card mb-4 p-4">
+    <h4 class="section-title">Price Movement Visualization</h4>
+
+    <h6>Daily</h6>
+    <img src="{{ url_for('static', filename='daily.png') }}" class="img-fluid mb-3">
+
+    <h6>Monthly (Average)</h6>
+    <img src="{{ url_for('static', filename='monthly.png') }}" class="img-fluid mb-3">
+
+    <h6>Yearly (Average)</h6>
+    <img src="{{ url_for('static', filename='yearly.png') }}" class="img-fluid">
+</div>
+
+<!-- 6️⃣ MODEL -->
+<div id="model" class="card mb-4 p-4 text-center">
+    <h4 class="section-title">Linear Regression Model</h4>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="p-3 border rounded bg-light">
+                <h6 class="fw-bold text-primary">Model Without Split (In-Sample)</h6>
+                <h3 class="equation-blue">
+                    Price = {{ a_full }} × Day + {{ b_full }}
+                </h3>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="p-3 border rounded bg-light">
+                <h6 class="fw-bold text-warning">80:20 Split Model (Out-of-Sample)</h6>
+                <h3 class="equation-green">
+                    Price = {{ a }} × Day + {{ b }}
+                </h3>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 5️⃣.1️⃣ MODEL COMPARISON VISUALIZATION -->
+<div id="model-comparison" class="card mb-4 p-4">
+    <h4 class="section-title">Model Comparison Visualization</h4>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <h6 class="text-center fw-bold text-primary">Model Without Split (In-Sample)</h6>
+            <img src="{{ url_for('static', filename='regression_no_split.png') }}" class="img-fluid mb-3">
+            <div class="text-center">
+                <p><b>MSE:</b> <span class="equation-blue">{{ mse_full }}</span></p>
+                <p><b>R²:</b> <span class="equation-green">{{ r2_full }}</span></p>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h6 class="text-center fw-bold text-warning">80:20 Split Model (Out-of-Sample)</h6>
+            <img src="{{ url_for('static', filename='regression_split.png') }}" class="img-fluid mb-3">
+            <div class="text-center">
+                <p><b>MSE:</b> <span class="equation-blue">{{ mse }}</span></p>
+                <p><b>R²:</b> <span class="equation-green">{{ r2 }}</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="alert alert-info mt-3">
+        <strong>Interpretation:</strong>
+        <ul class="mb-0">
+            <li><b>Without Split:</b> The model is evaluated using all data (in-sample). The R² value is usually higher because the model sees the same data during training and testing.</li>
+            <li><b>80:20 Split:</b> The model is tested on data not seen during training (out-of-sample). This provides a more realistic picture of model performance.</li>
+        </ul>
+    </div>
+</div>
+
+<!-- 7️⃣ REGRESSION -->
+<div id="regression" class="card mb-4 p-4 text-center">
+    <h4 class="section-title">Linear Regression Visualization</h4>
+    <img src="{{ url_for('static', filename='regression.png') }}" class="img-fluid mb-3">
+
+    <h3 class="equation-green">
+        Price = {{ a }} × Day + {{ b }}
+    </h3>
+</div>
+
+<!-- 8️⃣ PREDICTION -->
+<div id="prediction" class="card mb-4 p-4">
+    <h4 class="section-title">Gold Price Prediction 2026–2035</h4>
+
+    <p>
+        Predictions were made using a simple linear regression model
+        based on the relationship between time (<b>Days</b>) and gold prices.
+    </p>
+
+    <div class="table-responsive">
+        {{ table_prediksi | safe }}
+    </div>
+</div>
+
+<!-- 9️⃣ EVALUATION -->
+<div id="evaluation" class="card mb-5 p-4">
+    <h4 class="section-title text-center">Model Performance Evaluation</h4>
+
+    <div class="row mt-4">
+
+        <!-- WITHOUT SPLIT -->
+        <div class="col-md-6">
+            <div class="p-3 border rounded bg-light text-center">
+                <h6 class="fw-bold text-primary">
+                    Evaluation Without Split (In-Sample)
+                </h6>
+
+                <p><b>MSE:</b></p>
+                <h4 class="equation-blue">{{ mse_full }}</h4>
+
+                <p><b>R²:</b></p>
+                <h4 class="equation-green">{{ r2_full }}</h4>
+
+                <p class="text-muted mt-2">
+                    The model is evaluated using all training data.
+                </p>
+            </div>
+        </div>
+
+        <!-- WITH SPLIT -->
+        <div class="col-md-6">
+            <div class="p-3 border rounded bg-light text-center">
+                <h6 class="fw-bold text-warning">
+                    80:20 Split Evaluation (Out-of-Sample)
+                </h6>
+
+                <p><b>MSE:</b></p>
+                <h4 class="equation-blue">{{ mse }}</h4>
+
+                <p><b>R²:</b></p>
+                <h4 class="equation-green">{{ r2 }}</h4>
+
+                <p class="text-muted mt-2">
+                    The model is tested using future data (test set).
+                </p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- ✅ SMOOTH SCROLL (FIXED) -->
+<script>
+document.querySelectorAll('a.nav-link[href^="#"]').forEach(link => {
+    link.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+</script>
+
+</body>
+</html>
