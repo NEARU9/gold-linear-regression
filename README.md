@@ -12,6 +12,11 @@ The application allows users to upload CSV files (derived from the above data so
 - Simple Linear Regression models  
 - Model evaluation metrics (**MSE**, **R²**)  
 - Data previews and visualizations  
+---
+
+## 📊 Preview
+
+![Linear Regression](preview.png)
 
 ---
 
