@@ -17,7 +17,7 @@ The application allows users to upload CSV files (derived from the above data so
 I have made some modifications to the original Flask application so it can be hosted on Streamlit Cloud.
 
 You can check out the live version here:
-🔗 Live Demo on Streamlit (update this link after deployment)
+🔗 Live Demo on Streamlit (COOMING SOON)
 
 The code for the Streamlit version is available in:
 📁 app_streamlit.py
