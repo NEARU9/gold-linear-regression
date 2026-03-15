@@ -14,7 +14,7 @@ The application allows users to upload CSV files (derived from the above data so
 - Data previews and visualizations
 
 🚀 Streamlit Version
-I have made some modifications to the original Flask application so it can be hosted on Streamlit Cloud.
+I made several modifications to the original Flask application so it can be hosted on Streamlit Cloud, with a different interface from the original version.
 
 You can check out the live version here:
 🔗 Live Demo on Streamlit (COOMING SOON)
