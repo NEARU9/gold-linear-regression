@@ -1,341 +1,495 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Linear Regression Analysis Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hasil Analisis Regresi Linear</title>
 
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='result.css') }}">
-    
-    <style>
-        /* Memastikan navbar items tetap rapi */
-        .navbar-nav {
-            flex-wrap: wrap;
-        }
-        .nav-item {
-            white-space: nowrap;
-        }
-        @media (max-width: 1200px) {
-            .navbar-nav {
-                max-height: 400px;
-                overflow-y: auto;
-            }
-        }
-    </style>
 </head>
 
-<body>
+<body data-bs-spy="scroll" data-bs-target="#menu" data-bs-offset="90" tabindex="0">
 
-<!-- 🔷 NAVBAR -->
-<nav class="navbar navbar-expand-xl navbar-dark bg-dark sticky-top">
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-xl navbar-dark navbar-main sticky-top">
     <div class="container">
-        <a class="navbar-brand fw-bold">📊 Linear Regression</a>
-
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
+        <a class="navbar-brand" href="#info"><i class="fas fa-chart-line me-2"></i>Regresi Linear</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu"
+                aria-controls="menu" aria-expanded="false" aria-label="Buka menu">
             <span class="navbar-toggler-icon"></span>
         </button>
-
         <div class="collapse navbar-collapse" id="menu">
-            <ul class="navbar-nav ms-auto">
-
+            <ul class="navbar-nav ms-auto align-items-xl-center">
                 <li class="nav-item">
-                    <a class="nav-link text-warning fw-semibold" href="{{ url_for('index') }}">
-                        ⬅ New Data
+                    <a class="nav-link nav-back" href="{{ url_for('index') }}">
+                        <i class="fas fa-arrow-left me-1"></i> Input Data Baru
                     </a>
                 </li>
-
-                <li class="nav-item"><a class="nav-link" href="#info">Info</a></li>
-                <li class="nav-item"><a class="nav-link" href="#statistics">Stats</a></li>
-                <li class="nav-item"><a class="nav-link" href="#raw">Raw</a></li>
-                <li class="nav-item"><a class="nav-link" href="#cleaning">Clean</a></li>
-                <li class="nav-item"><a class="nav-link" href="#regression-data">Reg Data</a></li>
-                <li class="nav-item"><a class="nav-link" href="#graph">Graph</a></li>
+                <li class="nav-item"><a class="nav-link" href="#info">Info Data</a></li>
+                <li class="nav-item"><a class="nav-link" href="#statistik">Statistik</a></li>
+                <li class="nav-item"><a class="nav-link" href="#awal">Data Awal</a></li>
+                <li class="nav-item"><a class="nav-link" href="#clean">Cleaning</a></li>
+                <li class="nav-item"><a class="nav-link" href="#regresi-data">Data Regresi</a></li>
+                <li class="nav-item"><a class="nav-link" href="#grafik">Grafik</a></li>
                 <li class="nav-item"><a class="nav-link" href="#model">Model</a></li>
-                <li class="nav-item"><a class="nav-link" href="#regression">Reg</a></li>
-                <li class="nav-item"><a class="nav-link" href="#prediction">Predict</a></li>
-                <li class="nav-item"><a class="nav-link" href="#evaluation">Eval</a></li>
+                <li class="nav-item"><a class="nav-link" href="#perbandingan-model">Perbandingan</a></li>
+                <li class="nav-item"><a class="nav-link" href="#regresi">Regresi</a></li>
+                <li class="nav-item"><a class="nav-link" href="#prediksi">Prediksi</a></li>
+                <li class="nav-item"><a class="nav-link" href="#evaluasi">Evaluasi</a></li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container py-4">
+<main class="container py-4">
 
-<h1 class="text-center mb-4">📊 Simple Linear Regression Analysis - Gold Price</h1>
+    <header class="page-header">
+        <h1>Analisis Regresi Linear Sederhana Harga Emas</h1>
+        <p>Pra-pemrosesan data, visualisasi, model regresi, prediksi, dan evaluasi.</p>
+    </header>
 
-<!-- 1️⃣ INFO -->
-<div id="info" class="card mb-4 p-4">
-    <h4 class="section-title">Initial Data Information</h4>
-    <div class="row">
-        <div class="col-md-6">
-            <p><b>Number of rows:</b> {{ info_awal.jumlah_baris }}</p>
-            <p><b>Number of columns:</b> {{ info_awal.jumlah_kolom }}</p>
+    <!-- 1. INFO DATA AWAL -->
+    <section id="info" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Informasi Data Awal</h2>
         </div>
-        <div class="col-md-6">
-            <p><b>Column names:</b></p>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-2"><b>Jumlah baris:</b> {{ info_awal.jumlah_baris }}</p>
+                <p class="mb-3 mb-md-0"><b>Jumlah kolom:</b> {{ info_awal.jumlah_kolom }}</p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><b>Nama kolom:</b></p>
+                <ul class="mb-0">
+                    {% for c in info_awal.kolom %}
+                    <li>{{ c }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. STATISTIK DESKRIPTIF -->
+    <section id="statistik" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Statistik Deskriptif Harga Emas</h2>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Jumlah Data (n)</p>
+                    <h3 class="stat-value equation-blue">{{ stat.count }}</h3>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Rata-rata (Mean)</p>
+                    <h3 class="stat-value equation-green">{{ stat.mean }}</h3>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Standar Deviasi</p>
+                    <h3 class="stat-value equation-blue">{{ stat.std }}</h3>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Median (Q2)</p>
+                    <h3 class="stat-value equation-green">{{ stat['50%'] }}</h3>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Minimum</p>
+                    <h3 class="stat-value text-danger">{{ stat.min }}</h3>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Kuartil 1 (Q1)</p>
+                    <h3 class="stat-value equation-blue">{{ stat['25%'] }}</h3>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Kuartil 3 (Q3)</p>
+                    <h3 class="stat-value equation-blue">{{ stat['75%'] }}</h3>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat">
+                    <p class="stat-label">Maksimum</p>
+                    <h3 class="stat-value text-success">{{ stat.max }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="interpretasi">
+            <strong>Interpretasi:</strong>
+            <p class="mb-0 mt-1">
+                Data harga emas terdiri dari <b>{{ stat.count }}</b> observasi harian dengan rata-rata harga
+                <b>{{ stat.mean }}</b>. Harga tertinggi tercatat pada <b>{{ stat.max }}</b> dan terendah pada
+                <b>{{ stat.min }}</b>, dengan standar deviasi <b>{{ stat.std }}</b> yang menunjukkan fluktuasi
+                harga selama periode penelitian.
+            </p>
+        </div>
+    </section>
+
+    <!-- 3. DATA AWAL + FILTER -->
+    <section id="awal" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Cuplikan Data Awal</h2>
+            <span class="tag"><i class="fas fa-filter me-1"></i> Filter</span>
+            {% if table_awal_rows == 0 %}
+            <span class="tag tag-red">{{ table_awal_rows }} data</span>
+            {% else %}
+            <span class="tag tag-green">{{ table_awal_rows }} data</span>
+            {% endif %}
+            <span class="tag tag-muted">Total {{ total_data_awal }} data dari filter</span>
+        </div>
+
+        <div class="note">
+            <i class="fas fa-info-circle me-2"></i>
+            Menampilkan 10 data teratas dari hasil filter. Total data yang memenuhi filter:
+            <b>{{ total_data_awal }}</b> dari {{ info_awal.jumlah_baris }} total data (3 Jan 2006 - 30 Apr 2026).
+        </div>
+
+        <div class="filter-box">
+            <form method="GET" action="{{ url_for('result') }}">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Mulai</label>
+                        <input type="text" class="date-input datepicker" name="tanggal_mulai"
+                               placeholder="Contoh: 2006-01-03" value="{{ tanggal_mulai }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Akhir</label>
+                        <input type="text" class="date-input datepicker" name="tanggal_akhir"
+                               placeholder="Contoh: 2006-01-12" value="{{ tanggal_akhir }}">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn-apply">
+                            <i class="fas fa-check"></i> Terapkan
+                        </button>
+                        <a href="{{ url_for('reset') }}" class="btn-reset">
+                            <i class="fas fa-undo"></i> Reset
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Pertahankan filter prediksi -->
+                {% if pred_tanggal_mulai %}
+                <input type="hidden" name="pred_tanggal_mulai" value="{{ pred_tanggal_mulai }}">
+                {% endif %}
+                {% if pred_tanggal_akhir %}
+                <input type="hidden" name="pred_tanggal_akhir" value="{{ pred_tanggal_akhir }}">
+                {% endif %}
+            </form>
+
+            {% if tanggal_mulai or tanggal_akhir %}
+            <div class="filter-active">
+                <i class="fas fa-filter text-primary me-2"></i>
+                <strong>Filter Aktif:</strong>
+                {% if tanggal_mulai %}Dari: {{ tanggal_mulai }}{% endif %}
+                {% if tanggal_akhir %}Sampai: {{ tanggal_akhir }}{% endif %}
+                <span class="badge bg-primary ms-2">{{ total_data_awal }} data ditemukan</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="table-scroll">
+            {{ table_awal | safe }}
+        </div>
+    </section>
+
+    <!-- 4. CLEANING -->
+    <section id="clean" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Proses Pembersihan Data</h2>
+        </div>
+        <ul>
+            <li>Menghapus tanda koma pada kolom <b>Price</b></li>
+            <li>Mengubah <b>Price</b> menjadi numerik</li>
+            <li>Menghapus data kosong</li>
+            <li>Mengurutkan data berdasarkan tanggal</li>
+            <li>Filter data sampai 30 April 2026</li>
+        </ul>
+        <p class="mb-0"><b>Jumlah data setelah cleaning:</b> {{ info_setelah.jumlah_baris }}</p>
+    </section>
+
+    <!-- 5. DATA REGRESI -->
+    <section id="regresi-data" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Data Setelah Pembentukan Variabel Days</h2>
+            {% if table_regresi_rows == 0 %}
+            <span class="tag tag-red">{{ table_regresi_rows }} data</span>
+            {% else %}
+            <span class="tag tag-green">{{ table_regresi_rows }} data</span>
+            {% endif %}
+            <span class="tag tag-muted">Total {{ total_data_regresi }} data dari filter</span>
+        </div>
+
+        <div class="note">
+            <i class="fas fa-info-circle me-2"></i>
+            Menampilkan 10 data teratas dari hasil filter. Total data yang memenuhi filter:
+            <b>{{ total_data_regresi }}</b> dari {{ info_setelah.jumlah_baris }} total data.
+        </div>
+
+        <div class="table-scroll">
+            {{ table_regresi | safe }}
+        </div>
+    </section>
+
+    <!-- 6. GRAFIK -->
+    <section id="grafik" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Visualisasi Pergerakan Harga</h2>
+        </div>
+
+        <div class="figure">
+            <h3 class="sub-title">Harian (2006-2026)</h3>
+            <img src="{{ url_for('static', filename=img_harian) }}" alt="Grafik harga emas harian">
+        </div>
+
+        <div class="figure">
+            <h3 class="sub-title">Bulanan (Rata-rata) 2006-2026</h3>
+            <img src="{{ url_for('static', filename=img_bulanan) }}" alt="Grafik rata-rata harga emas bulanan">
+        </div>
+
+        <div class="figure">
+            <h3 class="sub-title">Tahunan (Rata-rata) 2006-2026</h3>
+            <img src="{{ url_for('static', filename=img_tahunan) }}" alt="Grafik rata-rata harga emas tahunan">
+        </div>
+    </section>
+
+    <!-- 7. MODEL -->
+    <section id="model" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Model Regresi Linear</h2>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="model-card">
+                    <h3 class="model-title">Model Tanpa Split (In-Sample)</h3>
+                    <p class="equation equation-blue">Harga = {{ a_full }} × Hari + {{ b_full }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="model-card is-split">
+                    <h3 class="model-title">Model Split 80:20 (Out-of-Sample)</h3>
+                    <p class="equation equation-green">Harga = {{ a }} × Hari + {{ b }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. PERBANDINGAN MODEL -->
+    <section id="perbandingan-model" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Visualisasi Perbandingan Model</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h3 class="sub-title text-center">Model Tanpa Split (In-Sample)</h3>
+                <img src="{{ url_for('static', filename=img_regresi_tanpa_split) }}" alt="Regresi tanpa split">
+                <div class="metric-row">
+                    <div class="metric"><small>MSE</small><strong class="equation-blue">{{ mse_full }}</strong></div>
+                    <div class="metric"><small>R²</small><strong class="equation-green">{{ r2_full }}</strong></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="sub-title text-center">Model Split 80:20 (Out-of-Sample)</h3>
+                <img src="{{ url_for('static', filename=img_regresi_split) }}" alt="Regresi split 80:20">
+                <div class="metric-row">
+                    <div class="metric"><small>MSE</small><strong class="equation-blue">{{ mse }}</strong></div>
+                    <div class="metric"><small>R²</small><strong class="equation-green">{{ r2 }}</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="interpretasi">
+            <strong>Interpretasi:</strong>
             <ul>
-                {% for c in info_awal.kolom %}
-                <li>{{ c }}</li>
-                {% endfor %}
+                <li><b>Tanpa Split:</b> Model dievaluasi menggunakan seluruh data (in-sample). Nilai R² biasanya lebih tinggi karena model melihat data yang sama saat training dan testing.</li>
+                <li><b>Split 80:20:</b> Model diuji pada data yang tidak dilihat saat training (out-of-sample). Ini memberikan gambaran performa model yang lebih realistis.</li>
             </ul>
         </div>
-    </div>
-</div>
+    </section>
 
-<!-- 1️⃣.1️⃣ DESCRIPTIVE STATISTICS -->
-<div id="statistics" class="card mb-4 p-4">
-    <h4 class="section-title">📈 Descriptive Statistics - Gold Price</h4>
-    
-    <div class="row">
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Data Count (n)</p>
-                <h4 class="equation-blue">{{ stat.count }}</h4>
-            </div>
+    <!-- 9. VISUALISASI REGRESI -->
+    <section id="regresi" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Visualisasi Regresi Linear</h2>
         </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Mean</p>
-                <h4 class="equation-green">{{ stat.mean }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Standard Deviation</p>
-                <h4 class="equation-blue">{{ stat.std }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Median (Q2)</p>
-                <h4 class="equation-green">{{ stat['50%'] }}</h4>
-            </div>
-        </div>
-    </div>
+        <img src="{{ url_for('static', filename=img_regresi) }}" alt="Garis regresi linear">
+        <p class="equation-big equation-green">Harga = {{ a }} × Hari + {{ b }}</p>
+    </section>
 
-    <div class="row mt-3">
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Minimum</p>
-                <h4 class="text-danger">{{ stat.min }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Quartile 1 (Q1)</p>
-                <h4 class="equation-blue">{{ stat['25%'] }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Quartile 3 (Q3)</p>
-                <h4 class="equation-blue">{{ stat['75%'] }}</h4>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="p-3 border rounded bg-light text-center">
-                <p class="mb-1 text-muted">Maximum</p>
-                <h4 class="text-success">{{ stat.max }}</h4>
-            </div>
-        </div>
-    </div>
-
-    <div class="alert alert-secondary mt-3">
-        <strong>Interpretation:</strong>
-        <p class="mb-0">
-            The gold price data consists of <b>{{ stat.count }}</b> daily observations with an average price of 
-            <b>{{ stat.mean }}</b>. The highest price recorded was <b>{{ stat.max }}</b> and the lowest was 
-            <b>{{ stat.min }}</b>, with a standard deviation of <b>{{ stat.std }}</b> indicating price 
-            fluctuations during the study period.
-        </p>
-    </div>
-</div>
-
-<!-- 2️⃣ RAW DATA -->
-<div id="raw" class="card mb-4 p-4">
-    <h4 class="section-title">Raw Data Preview</h4>
-    <div class="table-responsive">
-        {{ table_awal | safe }}
-    </div>
-</div>
-
-<!-- 3️⃣ CLEANING -->
-<div id="cleaning" class="card mb-4 p-4">
-    <h4 class="section-title">Data Cleaning Process</h4>
-    <ul>
-        <li>Removing commas in the <b>Price</b> column</li>
-        <li>Converting <b>Price</b> to numeric format</li>
-        <li>Removing empty data</li>
-        <li>Sorting data by date</li>
-    </ul>
-    <p><b>Number of rows after cleaning:</b> {{ info_setelah.jumlah_baris }}</p>
-</div>
-
-<!-- 4️⃣ REGRESSION DATA -->
-<div id="regression-data" class="card mb-4 p-4">
-    <h4 class="section-title">Data After Creating Days Variable</h4>
-    <div class="table-responsive">
-        {{ table_regresi | safe }}
-    </div>
-</div>
-
-<!-- 5️⃣ GRAPH -->
-<div id="graph" class="card mb-4 p-4">
-    <h4 class="section-title">Price Movement Visualization</h4>
-
-    <h6>Daily</h6>
-    <img src="{{ url_for('static', filename='daily.png') }}" class="img-fluid mb-3">
-
-    <h6>Monthly (Average)</h6>
-    <img src="{{ url_for('static', filename='monthly.png') }}" class="img-fluid mb-3">
-
-    <h6>Yearly (Average)</h6>
-    <img src="{{ url_for('static', filename='yearly.png') }}" class="img-fluid">
-</div>
-
-<!-- 6️⃣ MODEL -->
-<div id="model" class="card mb-4 p-4 text-center">
-    <h4 class="section-title">Linear Regression Model</h4>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="p-3 border rounded bg-light">
-                <h6 class="fw-bold text-primary">Model Without Split (In-Sample)</h6>
-                <h3 class="equation-blue">
-                    Price = {{ a_full }} × Day + {{ b_full }}
-                </h3>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="p-3 border rounded bg-light">
-                <h6 class="fw-bold text-warning">80:20 Split Model (Out-of-Sample)</h6>
-                <h3 class="equation-green">
-                    Price = {{ a }} × Day + {{ b }}
-                </h3>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- 5️⃣.1️⃣ MODEL COMPARISON VISUALIZATION -->
-<div id="model-comparison" class="card mb-4 p-4">
-    <h4 class="section-title">Model Comparison Visualization</h4>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <h6 class="text-center fw-bold text-primary">Model Without Split (In-Sample)</h6>
-            <img src="{{ url_for('static', filename='regression_no_split.png') }}" class="img-fluid mb-3">
-            <div class="text-center">
-                <p><b>MSE:</b> <span class="equation-blue">{{ mse_full }}</span></p>
-                <p><b>R²:</b> <span class="equation-green">{{ r2_full }}</span></p>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <h6 class="text-center fw-bold text-warning">80:20 Split Model (Out-of-Sample)</h6>
-            <img src="{{ url_for('static', filename='regression_split.png') }}" class="img-fluid mb-3">
-            <div class="text-center">
-                <p><b>MSE:</b> <span class="equation-blue">{{ mse }}</span></p>
-                <p><b>R²:</b> <span class="equation-green">{{ r2 }}</span></p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="alert alert-info mt-3">
-        <strong>Interpretation:</strong>
-        <ul class="mb-0">
-            <li><b>Without Split:</b> The model is evaluated using all data (in-sample). The R² value is usually higher because the model sees the same data during training and testing.</li>
-            <li><b>80:20 Split:</b> The model is tested on data not seen during training (out-of-sample). This provides a more realistic picture of model performance.</li>
-        </ul>
-    </div>
-</div>
-
-<!-- 7️⃣ REGRESSION -->
-<div id="regression" class="card mb-4 p-4 text-center">
-    <h4 class="section-title">Linear Regression Visualization</h4>
-    <img src="{{ url_for('static', filename='regression.png') }}" class="img-fluid mb-3">
-
-    <h3 class="equation-green">
-        Price = {{ a }} × Day + {{ b }}
-    </h3>
-</div>
-
-<!-- 8️⃣ PREDICTION -->
-<div id="prediction" class="card mb-4 p-4">
-    <h4 class="section-title">Gold Price Prediction 2026–2035</h4>
-
-    <p>
-        Predictions were made using a simple linear regression model
-        based on the relationship between time (<b>Days</b>) and gold prices.
-    </p>
-
-    <div class="table-responsive">
-        {{ table_prediksi | safe }}
-    </div>
-</div>
-
-<!-- 9️⃣ EVALUATION -->
-<div id="evaluation" class="card mb-5 p-4">
-    <h4 class="section-title text-center">Model Performance Evaluation</h4>
-
-    <div class="row mt-4">
-
-        <!-- WITHOUT SPLIT -->
-        <div class="col-md-6">
-            <div class="p-3 border rounded bg-light text-center">
-                <h6 class="fw-bold text-primary">
-                    Evaluation Without Split (In-Sample)
-                </h6>
-
-                <p><b>MSE:</b></p>
-                <h4 class="equation-blue">{{ mse_full }}</h4>
-
-                <p><b>R²:</b></p>
-                <h4 class="equation-green">{{ r2_full }}</h4>
-
-                <p class="text-muted mt-2">
-                    The model is evaluated using all training data.
-                </p>
-            </div>
+    <!-- 10. PREDIKSI -->
+    <section id="prediksi" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Prediksi Harga Emas Harian 2026–2035</h2>
+            <span class="tag"><i class="fas fa-filter me-1"></i> Filter</span>
+            <span class="tag tag-green">{{ table_prediksi_rows }} data</span>
         </div>
 
-        <!-- WITH SPLIT -->
-        <div class="col-md-6">
-            <div class="p-3 border rounded bg-light text-center">
-                <h6 class="fw-bold text-warning">
-                    80:20 Split Evaluation (Out-of-Sample)
-                </h6>
-
-                <p><b>MSE:</b></p>
-                <h4 class="equation-blue">{{ mse }}</h4>
-
-                <p><b>R²:</b></p>
-                <h4 class="equation-green">{{ r2 }}</h4>
-
-                <p class="text-muted mt-2">
-                    The model is tested using future data (test set).
-                </p>
-            </div>
+        <div class="note note-blue">
+            <i class="fas fa-info-circle me-2"></i>
+            Prediksi harian dari <b>1 Januari 2026</b> sampai <b>31 Desember 2035</b>.
+            Gunakan filter tanggal untuk melihat prediksi per periode (misal: 2026-01-01 sampai 2026-12-31).
+            Total data prediksi: <b>3.652 hari</b> (10 tahun).
         </div>
 
-    </div>
-</div>
+        <div class="filter-box">
+            <form method="GET" action="{{ url_for('result') }}">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Mulai Prediksi</label>
+                        <input type="text" class="date-input datepicker-prediksi" name="pred_tanggal_mulai"
+                               placeholder="Contoh: 2026-01-01" value="{{ pred_tanggal_mulai }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Tanggal Akhir Prediksi</label>
+                        <input type="text" class="date-input datepicker-prediksi" name="pred_tanggal_akhir"
+                               placeholder="Contoh: 2026-12-31" value="{{ pred_tanggal_akhir }}">
+                    </div>
+                    <div class="col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn-apply">
+                            <i class="fas fa-check"></i> Terapkan
+                        </button>
+                        <a href="{{ url_for('reset') }}" class="btn-reset">
+                            <i class="fas fa-undo"></i> Reset Semua
+                        </a>
+                    </div>
+                </div>
 
-</div>
+                <!-- Pertahankan filter data awal -->
+                {% if tanggal_mulai %}
+                <input type="hidden" name="tanggal_mulai" value="{{ tanggal_mulai }}">
+                {% endif %}
+                {% if tanggal_akhir %}
+                <input type="hidden" name="tanggal_akhir" value="{{ tanggal_akhir }}">
+                {% endif %}
+            </form>
+
+            {% if pred_tanggal_mulai or pred_tanggal_akhir %}
+            <div class="filter-active">
+                <i class="fas fa-filter text-primary me-2"></i>
+                <strong>Filter Prediksi Aktif:</strong>
+                {% if pred_tanggal_mulai %}Dari: {{ pred_tanggal_mulai }}{% endif %}
+                {% if pred_tanggal_akhir %}Sampai: {{ pred_tanggal_akhir }}{% endif %}
+                <span class="badge bg-primary ms-2">{{ table_prediksi_rows }} data ditemukan</span>
+            </div>
+            {% else %}
+            <div class="filter-active filter-active-all">
+                <i class="fas fa-info-circle text-success me-2"></i>
+                <strong>Menampilkan semua data prediksi:</strong> 1 Jan 2026 - 31 Des 2035 (3.652 hari)
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="table-scroll">
+            {{ table_prediksi | safe }}
+        </div>
+    </section>
+
+    <!-- 11. EVALUASI -->
+    <section id="evaluasi" class="panel">
+        <div class="panel-head">
+            <h2 class="section-title">Evaluasi Kinerja Model</h2>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="model-card">
+                    <h3 class="model-title">Evaluasi Tanpa Split (In-Sample)</h3>
+                    <div class="metric-row">
+                        <div class="metric"><small>MSE</small><strong class="equation-blue">{{ mse_full }}</strong></div>
+                        <div class="metric"><small>R²</small><strong class="equation-green">{{ r2_full }}</strong></div>
+                    </div>
+                    <p class="model-desc">Model dievaluasi menggunakan seluruh data training.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="model-card is-split">
+                    <h3 class="model-title">Evaluasi Split 80:20 (Out-of-Sample)</h3>
+                    <div class="metric-row">
+                        <div class="metric"><small>MSE</small><strong class="equation-blue">{{ mse }}</strong></div>
+                        <div class="metric"><small>R²</small><strong class="equation-green">{{ r2 }}</strong></div>
+                    </div>
+                    <p class="model-desc">Model diuji menggunakan data masa depan (test set).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="page-footer">
+    Sistem Analisis Regresi Linear Sederhana • Skripsi • Teknik Informatika
+</footer>
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- ✅ SMOOTH SCROLL (FIXED) -->
 <script>
-document.querySelectorAll('a.nav-link[href^="#"]').forEach(link => {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-            behavior: 'smooth'
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Tutup menu mobile setelah salah satu tautan diklik
+    var menu = document.getElementById('menu');
+    document.querySelectorAll('#menu a.nav-link').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (menu.classList.contains('show')) {
+                bootstrap.Collapse.getOrCreateInstance(menu).hide();
+            }
         });
+    });
+
+    // Date picker data awal
+    flatpickr(".datepicker", {
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        locale: "id",
+        maxDate: "2026-04-30"
+    });
+
+    // Date picker prediksi (2026-2035)
+    flatpickr(".datepicker-prediksi", {
+        dateFormat: "Y-m-d",
+        allowInput: true,
+        locale: "id",
+        minDate: "2026-01-01",
+        maxDate: "2035-12-31",
+        onChange: function (selectedDates, dateStr, instance) {
+            if (dateStr) {
+                var date = new Date(dateStr);
+                if (date < new Date('2026-01-01') || date > new Date('2035-12-31')) {
+                    alert('Tanggal prediksi harus antara 2026-01-01 sampai 2035-12-31');
+                    instance.clear();
+                }
+            }
+        }
     });
 });
 </script>
