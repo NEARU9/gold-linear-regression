@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Upload Data | Linear Regression</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Unggah Data | Regresi Linear</title>
 
-    <!-- Bootstrap -->
+    <!-- Bootstrap & Icon -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
-    <!-- Icon -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
@@ -16,57 +20,117 @@
 
 <body>
 
-<div class="container d-flex align-items-center justify-content-center vh-100">
+<main class="page">
 
-    <div class="upload-card text-center">
+    <section class="upload-card">
 
-        <div class="icon-box mb-3">
-            <i class="bi bi-graph-up-arrow"></i>
-        </div>
-
-        <h2 class="mb-2">Linear Regression Analysis</h2>
-
-        <p class="subtitle mb-4">
-            Upload your <strong>gold price CSV file</strong> to perform
-            data preprocessing, visualization, and prediction.
-        </p>
-
-        <!-- TOMBOL DOWNLOAD SAMPLE DATA -->
-        <div class="mb-3">
-            <a href="{{ url_for('static', filename='gold_price_2006_2025.csv') }}" 
-               class="btn btn-outline-success w-100 mb-3" 
-               download="gold_price_data.csv">
-                <i class="bi bi-download me-1"></i> Download Sample Data CSV
-            </a>
-            <small class="text-muted d-block">Download sample gold price data 2006-2025</small>
-        </div>
-
-        <form action="/process" method="post" enctype="multipart/form-data">
-
-            <div class="mb-3">
-                <input class="form-control" type="file" name="file" accept=".csv" required>
-                <small class="text-muted">Format: Date,Price (example: 2020-01-02,1521.55)</small>
+        <header class="text-center">
+            <div class="icon-box">
+                <i class="bi bi-graph-up-arrow"></i>
             </div>
+            <h1>Analisis Regresi Linear</h1>
+            <p class="subtitle">
+                Unggah file CSV harga emas untuk pra-pemrosesan data,
+                visualisasi, dan prediksi.
+            </p>
+        </header>
+
+        <form action="{{ url_for('process_upload') }}" method="post" enctype="multipart/form-data">
+
+            <input type="file" id="fileInput" name="file" accept=".csv" required hidden>
+
+            <!-- Area unggah: klik atau seret file -->
+            <label for="fileInput" id="dropZone" class="drop-zone">
+                <i class="bi bi-cloud-arrow-up drop-icon"></i>
+                <span class="drop-title" id="namaFile">Pilih atau seret file CSV ke sini</span>
+                <span class="drop-hint" id="hintFile">Hanya file berformat .csv</span>
+            </label>
 
             <button class="btn btn-primary w-100" type="submit">
-                <i class="bi bi-play-circle me-1"></i> Process Data
+                <i class="bi bi-play-circle me-2"></i>Proses Data
             </button>
-
         </form>
 
-        <hr class="my-4">
+        <!-- Sumber data -->
+        <div class="sumber">
+            <p class="sumber-judul">Belum punya data?</p>
+            <div class="sumber-list">
+                <a href="https://www.investing.com/commodities/gold-historical-data"
+                   target="_blank" rel="noopener noreferrer" class="sumber-item">
+                    <i class="bi bi-graph-up"></i>
+                    <span>
+                        <strong>Investing.com</strong>
+                        <small>Gold Historical Data</small>
+                    </span>
+                    <i class="bi bi-box-arrow-up-right ms-auto"></i>
+                </a>
 
-        <div class="footer-text">
-            Simple Linear Regression Analysis System<br>
-            <span>Thesis • Informatics Engineering</span>
+                <a href="https://drive.google.com/drive/folders/1Gi-bom1xavlqK_-ixnqcVhImqW5SSkWo?usp=drive_link"
+                   target="_blank" rel="noopener noreferrer" class="sumber-item">
+                    <i class="bi bi-google"></i>
+                    <span>
+                        <strong>Google Drive</strong>
+                        <small>Dataset CSV</small>
+                    </span>
+                    <i class="bi bi-box-arrow-up-right ms-auto"></i>
+                </a>
+            </div>
         </div>
 
-    </div>
+        <footer class="footer-text">
+            Sistem Analisis Regresi Linear Sederhana<br>
+            <span>Skripsi • Teknik Informatika</span>
+        </footer>
 
-</div>
+    </section>
 
-<!-- Bootstrap JS (untuk dropdown jika diperlukan) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</main>
+
+<script>
+(function () {
+    var input = document.getElementById('fileInput');
+    var zone  = document.getElementById('dropZone');
+    var nama  = document.getElementById('namaFile');
+    var hint  = document.getElementById('hintFile');
+
+    function tampilkan() {
+        var f = input.files[0];
+        if (f) {
+            nama.textContent = f.name;
+            hint.textContent = (f.size / 1024).toFixed(1) + ' KB • klik untuk mengganti';
+            zone.classList.add('has-file');
+        } else {
+            nama.textContent = 'Pilih atau seret file CSV ke sini';
+            hint.textContent = 'Hanya file berformat .csv';
+            zone.classList.remove('has-file');
+        }
+    }
+
+    input.addEventListener('change', tampilkan);
+
+    ['dragenter', 'dragover'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) {
+            e.preventDefault();
+            zone.classList.add('dragover');
+        });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+        zone.addEventListener(ev, function (e) {
+            e.preventDefault();
+            zone.classList.remove('dragover');
+        });
+    });
+    zone.addEventListener('drop', function (e) {
+        var f = e.dataTransfer.files[0];
+        if (f && f.name.toLowerCase().endsWith('.csv')) {
+            input.files = e.dataTransfer.files;
+            tampilkan();
+        } else {
+            hint.textContent = 'File harus berformat .csv';
+        }
+    });
+})();
+</script>
 
 </body>
 </html>
